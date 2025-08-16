@@ -5,7 +5,6 @@ import {
   TonalPalette,
   Scheme,
   CorePalette,
-  rgbaFromInt,
 } from "@material/material-color-utilities";
 import { rgbaToHsl } from "@med/ts-color-converter";
 
@@ -14,6 +13,13 @@ interface ThemeColors {
   secondary: string;
   tertiary: string;
   neutral: string;
+}
+
+function argbToRgba(argb: number) {
+  const r = (argb >> 16) & 0xff;
+  const g = (argb >> 8) & 0xff;
+  const b = argb & 0xff;
+  return { r, g, b, a: 1 }; // Alpha is not used in HSL conversion
 }
 
 /**
@@ -48,7 +54,7 @@ export function generateTheme(colors: ThemeColors): string {
     const jsonScheme = scheme.toJSON();
     return Object.entries(jsonScheme)
       .map(([key, value]) => {
-        const { r, g, b } = rgbaFromInt(value);
+        const { r, g, b } = argbToRgba(value);
         const hsl = rgbaToHsl({ r, g, b, a: 1 });
         return `    --${toCssCasing(key)}: ${hsl.h} ${hsl.s}% ${hsl.l}%;`;
       })
